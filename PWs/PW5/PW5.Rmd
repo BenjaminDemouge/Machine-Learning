@@ -1,0 +1,185 @@
+---
+title: "PW5"
+output: html_notebook
+---
+PART-1: SINGLE TREE
+Question 1
+```{r}
+install.packages('caTools')
+library(MASS)
+library(caTools)
+set.seed(18)
+Boston_idx = sample(1:nrow(Boston), nrow(Boston) / 2) 
+# You don't know what we just did?
+# open the documentation of the function sample by 
+# writing ?sample in the R console.
+# Note that this is one of the ways to split it randomly and it is not necessary the best.
+Boston_train = Boston[Boston_idx,]
+Boston_test  = Boston[-Boston_idx,]
+```
+Question 2
+```{r}
+library(rpart)
+Boston_tree = rpart(medv ~ ., data = Boston_train)
+Boston_tree
+```
+Question 3
+```{r}
+plot(Boston_tree)
+text(Boston_tree, pretty = 0)
+title(main = "Boston Tree")
+```
+Question 4
+```{r}
+install.packages('rpart.plot')
+library(rpart.plot)
+rpart.plot(Boston_tree)
+prp(Boston_tree)
+```
+Question 5
+```{r}
+printcp(Boston_tree)
+plotcp(Boston_tree)
+```
+Question 6
+```{r}
+rmse = function(actual, predicted) 
+  {
+  sqrt(mean((actual - predicted) ^ 2))
+  }
+```
+Question 7
+```{r}
+Boston_tree_prediction = predict(Boston_tree,newdata = Boston_test ) 
+rmse(Boston_test$medv,Boston_tree_prediction)
+```
+Question 8
+```{r}
+lm = lm(medv ~ ., data = Boston_train)
+lm_prediction = predict(lm, newdata = Boston_test)
+```
+```{r}
+rmse(Boston_test$medv,lm_prediction)
+```
+```{r}
+plot(Boston_tree_prediction, Boston_test$medv, 
+     xlab = "Predicted", ylab = "Actual", 
+     main = "Single Tree",
+     col = "darkred", pch = 20)
+grid()
+abline(0, 1, col = "blue", lwd = 2)
+
+plot(lm_prediction, Boston_test$medv,
+     xlab = "Predicted", ylab = "Actual",
+     main = "Linear model",
+     col = "darkred", pch = 20)
+grid()
+abline(0, 1, col = "blue", lwd = 2)
+```
+PART-2: BAGGING
+
+Question 9 
+```{r}
+#install.packages('randomForest')
+library(randomForest)
+Boston_bagging = randomForest(medv ~ ., data = Boston_train)
+Boston_bagging 
+```
+Question 10
+```{r}
+Boston_bagging_prediction = predict(Boston_bagging, newdata = Boston_test)
+```
+```{r}
+rmse(Boston_bagging_prediction, Boston_test$medv)
+```
+```{r}
+plot(Boston_bagging, col = "darkred", lwd = 1, main = "Correlation between Trees and errors")
+grid()
+```
+PART-3 : RANDOM FOREST
+
+Question 11
+```{r}
+Boston_forest = randomForest(medv ~ ., data = Boston_train)
+Boston_forest
+```
+
+```{r}
+Boston_forest_prediction = predict(Boston_forest, newdata = Boston_test)
+```
+
+```{r}
+rmse(Boston_forest_prediction, Boston_test$medv)
+```
+Question 12
+```{r}
+importance(Boston_forest)
+```
+Question 13
+```{r}
+varImpPlot(Boston_forest)
+```
+PART-4: BOOSTING
+
+Question 14
+```{r}
+install.packages('gbm')
+library(gbm)
+```
+```{r}
+Boston_boost = gbm(medv ~ ., data = Boston_train, distribution = "gaussian", 
+                    n.trees = 5000)
+Boston_boost_prediction = predict(Boston_boost, newdata = Boston_test)
+```
+```{r}
+rmse(Boston_boost_prediction, Boston_test$medv)
+```
+Question 15
+```{r}
+summary(Boston_boost)
+```
+Question 16
+```{r}
+spam = read.csv('spam.csv')
+```
+
+```{r}
+accuracy = function(predicted, actual)
+  {
+  mean(predicted == actual)
+  }
+```
+```{r}
+dt = read.csv("spam.csv")
+```
+```{r}
+dt$spam = as.factor(dt$spam)
+```
+```{r}
+library(caTools)
+set.seed(44)
+split = sample.split(dt$spam, SplitRatio = 0.8)
+training_set = subset(dt, split == TRUE)
+test_set = subset(dt, split == FALSE)
+```
+```{r}
+classification = glm(spam ~ ., family = "binomial", data=training_set)
+```
+```{r}
+classification
+```
+```{r}
+summary(classification)
+```
+```{r}
+prediction = predict(classification, newdata = test_set, type="response")
+
+prediction_B = ifelse(prediction >= 0.5, TRUE,FALSE)#B for booleen
+```
+```{r}
+accuracy_lr = accuracy(prediction_B, test_set$spam)#lr for log, regression
+```
+```{r}
+tree = rpart(spam ~ ., data = training_set)
+rpart.plot(tree)
+```
