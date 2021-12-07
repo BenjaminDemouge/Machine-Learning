@@ -1,0 +1,198 @@
+---
+title: "Demouge Benjamin - PW 6"
+author: "Benjamin Demouge"
+output: html_notebook
+---
+
+
+### Question 1
+```{r}
+iris <- read.csv("datasets/iris.data")
+head(iris)
+```
+
+### Question 2
+```{r}
+par(mfrow = c(2, 2))
+boxplot(iris$sepal_length~iris$class)
+boxplot(iris$sepal_width~iris$class)
+boxplot(iris$petal_length~iris$class)
+boxplot(iris$petal_width~iris$class)
+```
+
+### Question 3
+```{r}
+library(ggplot2)
+
+# histogram of sepal_length
+ggplot(iris, aes(x = sepal_length, fill = class)) +
+  geom_histogram(binwidth = .2, alpha = .5)
+# histogram of sepal_width
+ggplot(iris, aes(x = sepal_width, fill = class)) +
+  geom_histogram(binwidth = .2, alpha = .5)
+# histogram of petal_length
+ggplot(iris, aes(x = petal_length, fill = class)) +
+  geom_histogram(binwidth = .2, alpha = .5)
+# histogram of petal_width
+ggplot(iris, aes(x = petal_width, fill = class)) +
+  geom_histogram(binwidth = .2, alpha = .5)
+```
+
+### Question 4
+```{r}
+pcairis <- princomp(iris[, -5], cor=T)
+str(pcairis)
+```
+```{r}
+summary(pcairis)
+```
+```{r}
+plot(pcairis)
+```
+
+```{r}
+biplot(pcairis)
+```
+
+
+### Question 5
+```{r}
+library(factoextra)
+fviz_eig(pcairis, addlabels = TRUE)
+```
+```{r}
+fviz_pca_var(
+  pcairis,
+  col.var = "cos2",
+  gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+  repel = TRUE # Évite le chevauchement de texte
+)
+```
+
+```{r}
+fviz_pca_ind(
+  pcairis,
+  col.ind = "cos2",
+  gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+  repel = TRUE # Évite le chevauchement de texte
+)
+```
+
+
+```
+
+```{r}
+fviz_pca_biplot(
+    pcairis,
+    repel = TRUE,
+    col.var = "#2E9FDF", # Couleur des variables
+    col.ind = "#696969"  # Couleur des individues
+)
+```
+
+```{r}
+fviz_contrib(pcairis, choice = "var", axes = 1)
+```
+
+```{r}
+fviz_contrib(pcairis, choice = "var", axes = 2)
+```
+
+
+### Question 6
+```{r}
+X <- iris[,-5]
+y <- iris[,5]
+```
+
+### Question 7
+```{r}
+X_scaled <- scale(X)
+summary(X_scaled)
+```
+
+### Question 8
+```{r}
+cov_matrix <- cov(X_scaled)
+cov_matrix
+```
+
+### Question 9
+```{r}
+eigen_decomposition <- eigen(cov_matrix)
+eigen_decomposition
+```
+With the eigen function, you obtain the eigenvalues and the eigenvectors.
+
+### Question 10
+```{r}
+corr_matrix <- cor(X_scaled)
+eigen(corr_matrix)
+```
+
+### Question 11
+```{r}
+corr_matrix <- cor(X)
+eigen(corr_matrix)
+```
+It is the same values with X_scaled and with X.
+
+
+### Question 12
+
+```{r}
+explained_variations <- eigen_decomposition$values / sum(eigen_decomposition$values)
+explained_variations
+```
+
+```{r}
+explained_variations_cumulated <- cumsum(explained_variations)
+explained_variations_cumulated
+```
+
+### Question 13
+```{r}
+plot(explained_variations, type="b")
+```
+
+### Question 14
+```{r}
+projection_matrix <- eigen_decomposition$vectors[, 1:2]
+```
+
+
+### Question 15
+```{r}
+Y <- X_scaled %*% projection_matrix
+dim(Y)
+```
+```{r}
+head(Y)
+```
+
+### Question 16
+```{r}
+plot(Y, xlab="PC1", ylab="PC2")
+```
+
+### Question 17
+```
+```{r}
+my_cols <- c("red", "green", "blue")
+plot(
+  Y,
+  col=my_cols[as.integer(as.factor(iris$class))],
+  xlab = "PC1",
+  ylab = "PC2",
+  main="Plot of the data on the new feature space",
+)
+
+legend(
+  2,
+  2.6,
+  legend=unique(iris$class),
+  col=my_cols,
+  lty=1:2,
+  cex=0.8
+)
+```

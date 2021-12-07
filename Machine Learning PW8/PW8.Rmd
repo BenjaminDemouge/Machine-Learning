@@ -1,0 +1,190 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Q1) Download and import Data1  and Data2 . Plot both of the datasets on the same window. Color the observations with respect to the ground truth, like in Figure 8.6.
+```{r}
+data1 = read.csv("https://www.mghassany.com/MLcourse/datasets/data1.csv")
+data2 = read.csv("https://www.mghassany.com/MLcourse/datasets/data2.csv")
+```
+```{r}
+par(mfrow=c(1,2))
+plot(data1[,1:2], bg=data1$truth, pch=21, main="Data1")
+plot(data2[,1:2], bg=data2$truth, pch=21, main="Data2")
+```
+
+Q2) Apply k-means on both datasets with 4 clusters. Plot both of the dataset on the same window and color the 
+observations with respect to k-means results. Interpret the results.
+```{r}
+set.seed(71355)
+km1 <- kmeans(data1[,1:2], 4)
+km2 <- kmeans(data2[,1:2], 4)
+par(mfrow=c(1,2))
+plot(data1[,1:2], pch=21, bg=km1$cluster)
+plot(data2[,1:2], pch=21, bg=km2$cluster)
+
+```
+
+the model clustered the data into 4 clusters, and we see that the second data is not separated correctly. (K-means)
+
+Q3) Now fit a GMM model on the datasets. To do so, load the mclust library. Then you can use the function Mclust() on your data (this function will choose automatically the number of mixtures, basing on BIC criterion). Use the clustering results from your GMM model to visualize the results on both of the datasets, color the observations with respect to the clusters obtained from the GMM model. Interpret the results.
+```{r}
+library(mclust)
+gmm1 = Mclust(data1[,1:2])
+```
+```{r}
+gmm2 = Mclust(data2[,1:2])
+```
+
+```{r}
+par(mfrow=c(1,2))
+plot(data1[,1:2], pch=21, bg=gmm1$classification)
+plot(data2[,1:2], pch=21, bg=gmm2$classification)
+```
+now the model gmm is better that the k-means as we can compare the second graph
+
+Q4) Show the summary of the GMM model you fitted on Data2. Explain what it shows
+```{r}
+summary(gmm2)
+```
+BIC correspond to the Bayesian Information Criterion.
+It is a measure of the goodness of fit of a model.
+ICL correspond to the Information Criterion.
+
+
+# What is the log likelihood of the GMM model you fitted on Data2?
+log likelihood correspond to the log likelihood of the model. It means that the log likelihood is the sum of the log likelihood of each observation.
+
+# How is calculated the log likelihood on 1 observation?
+The log likelihood is calculated by the following formula:
+log likelihood = -0.5 * (n * log(2 * pi) + log(det(Sigma)) + (n/2) * log(det(Sigma_i)))
+
+Q5) mclust package offers some visualization. To plot your two-dimensional data, use the standard plot function applied on your model. Apply the following code, given that the model is named gmm_model, and interpret what it shows.
+```{r}
+gmm_model <- Mclust(data2[,1:2])
+plot(gmm_model, what = "classification")
+plot(gmm_model, what = "uncertainty")
+```
+
+Q6) mclust package uses the Bayesian Information Criterion (BIC) to choose the best number of mixtures. To see the values of BIC for different number of mixtures use the following code.
+```{r}
+plot(gmm_model, what = "BIC")
+```
+
+
+7. Though GMM is often categorized as a clustering algorithm, fundamentally it is an algorithm for density estimation. That is to say, the result of a GMM fit to some data is technically not a clustering model, but a generative probabilistic model describing the distribution of the data. Density estimation plays an important role in applied statistical data analysis and theoretical research. A density estimate based on GMM can be obtained using the function densityMclust(). Apply it on Data2 and visualize the estimated densities (show an “image” and a “perspective” plot of the bivariate density estimate).
+```{r}
+library(mclust)
+den = densityMclust(data2[,1:2])
+plot(den, what="density",type = 'persp', data=data2[,1:2])
+plot(den, what="density",type = 'image', data=data2[,1:2])
+```
+
+8. Create a data table of 300 observations in which you have two columns:
+
+The first column contains generated data. Those data are generated from three Gaussian distributions with different parameters.
+The second column corresponds to the groud truth (every observation was generated from which Gaussian).
+Hint: functions you may need are rnorm(), rep(), rbind() or cbind().
+You must of course set a seed (your sutdent_pk). An example of 9 generated values from three Gaussians is shown in the following table:
+
+```{r}
+set.seed(713555)
+r1 = rnorm(100,0,1)
+r2 = rnorm(100,-4,1.2)
+r3 = rnorm(100,5,0.8)
+
+data = data.frame(X = c(r1,r2,r3), source = c(rep(1,100), rep(2,100), rep(3,100)))
+data
+```
+
+9. Show your generated data on one axe (this kind of figures are called stripchart), color them with respect to ground truth, you must obtain something like:
+
+```{r}
+stripchart(data$X, pch=21,bg=data$source)
+```
+
+10. Plot the histogram corresponding to your generated data. Interpret it.
+
+```{r}
+hist(data$X, main = 'Histogram')
+```
+we observe 3 gaussians as it is suppose to be
+
+11. Fit a GMM model on your generated data. Print the summary and visualize your results. Explain your results.
+```{r}
+gmm = Mclust(data$X)
+par(mfrow=c(1,2))
+plot(gmm, what = "classification")
+plot(gmm, what = "uncertainty")
+
+```
+
+12. Apply a density estimate on your generated data and visualize it. Interpret the obtained figure.
+```{r}
+density = densityMclust(data$X)
+plot(density, what="density",data=data$X,breaks=50)
+
+```
+
+
+
+2.1 Generate a two-dimensional dataset from a k-component Gaussian mixture density with different means and different covariance matrices. It is up to you to choose the mixing proportions  
+```{r}
+set.seed(713555)
+r1 = rnorm(50,0,0.8)
+r2 = rnorm(100,-4,1)
+r3 = rnorm(200,5,1.2)
+
+r4 = rnorm(50,0,1)
+r5 = rnorm(100,-6,0.8)
+r6 = rnorm(200,4,1.2)
+
+data = data.frame(X1 = c(r1,r2,r3),X2 = c(r4,r5,r6))
+plot(data$X1,data$X2)
+```
+
+
+2.2 Implement the EM algorithm to fit a GMM on your generated data:
+
+Initialize the mixing proportions and the covariance matrices (e.g., you can initialize with equal mixing proportions and Identity covariance matrices).
+Initialize the means “randomly” (by your own choice of  k).
+In the EM training loop, store the value of the observed-data log-likelihood at each iteration.
+At convergence, plot the log-likelihood curve.
+
+```{r}
+k = 3
+means = runif(k,-10,10)
+pi = rep(1/3, 3)
+cov = 
+    
+  
+
+
+```
+
+2.3 Create a function that selects the number of mixture components by computing the values of BIC criterion for  
+k
+  varying from 1 to 10.
+```{r}
+
+```
+  
+
+2.4 On your generated data, compare your results obtained with the algorithm you developed and the ground truth (in terms of the chosen number of mixture components; and in terms of error rate).
+```{r}
+
+```
+
+2.5 Apply the algorithm you developed on Iris  dataset.
+```{r}
+```
+
+
+```{r}
+```
+
+
+
+
+

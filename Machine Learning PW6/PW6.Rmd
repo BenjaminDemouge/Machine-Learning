@@ -1,0 +1,106 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+dt = read.csv('iris.data')
+```
+2. Compare the means and the quartiles of the 3 different flower classes for the 4 different features (Plot 4 boxplots into the same figure).
+```{r}
+library(ggplot2)
+par(mfrow=c(2,2))
+boxplot(dt$sepal_length~dt$class)
+boxplot(dt$sepal_width~dt$class)
+boxplot(dt$petal_length~dt$class)
+boxplot(dt$petal_width~dt$class)
+```
+3. To explore how the 3 different flower classes are distributed along the 4 different features, visualize them via histograms using the following code.
+```{r}
+# histogram of sepal_length
+ggplot(iris, aes(x=sepal_length, fill=class)) +
+  geom_histogram(binwidth=.2, alpha=.5)
+# histogram of sepal_width
+ggplot(iris, aes(x=sepal_width, fill=class)) +
+  geom_histogram(binwidth=.2, alpha=.5)
+# histogram of petal_length
+ggplot(iris, aes(x=petal_length, fill=class)) +
+  geom_histogram(binwidth=.2, alpha=.5)
+# histogram of petal_width
+ggplot(iris, aes(x=petal_width, fill=class)) +
+  geom_histogram(binwidth=.2, alpha=.5)
+```
+4. Apply a PCA on the Iris dataset using the princomp() function and interpret the results.
+```{r}
+
+```
+5. Using factoextra package plot the following:
+
+The scree plot.
+The graph of individuals.
+The graph of variables.
+The biplot graph.
+The contributions of the variables to the first 2 principal components.
+```{r}
+
+```
+6. First step, split the iris dataset into data  
+X
+  and class labels  
+y
+ .
+```{r}
+
+```
+7. Scale the 4 features. Store the scaled matrix into a new one (for example, name it X_scaled).
+
+```{r}
+
+```
+8. The classic approach to PCA is to perform the eigendecomposition on the covariance matrix  
+Σ
+ , which is a  
+p
+×
+p
+  matrix where each element represents the covariance between two features. Compute the Covariance Matrix of the scaled features (Print the results).
+```{r}
+
+```
+
+9. Perform an eigen decomposition on the covariance matrix. Compute the Eigen vectors and the Eigenvalues (you can use the eigen() function). What do you obtain?
+```{r}
+```
+10. Perform an eigendecomposition of the standardized data based on the correlation matrix.
+```{r}
+```
+11. Perform an eigendecomposition of the raw data based on the correlation matrix. Compare the obtained results with the previous question
+```{r}
+```
+12. Calculate the individual explained variation and the cumulative explained variation of each principal component. Show the results
+```{r}
+```
+13. Plot the individual explained variation. (scree plot)
+```{r}
+```
+14. Construct the projection matrix that will be used to transform the Iris data onto the new feature subspace
+```{r}
+```
+15. Compute  
+Y
+  (Recall the  
+Y
+  is the matrix of scores,  
+A
+  is the matrix of loadings).
+```{r}
+```
+16. Plot the observations on the new feature space. Name the axis PC1 and PC2.
+```{r}
+```
+17. On the same plot, color the observations (the flowers) with respect to their flower classes.
+```{r}
+```
+
+
+```{r}
+```

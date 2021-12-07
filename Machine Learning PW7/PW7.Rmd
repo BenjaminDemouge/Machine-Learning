@@ -1,0 +1,301 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+Q1
+```{r}
+ligue1 <- read.csv("http://mghassany.com/MLcourse/obsvsets/ligue1_17_18.csv", row.names=1, sep=";")
+```
+Q2
+```{r}
+head(ligue1,2)
+```
+```{r}
+library(knitr)
+knitr::kable(ligue1[1:2,])
+```
+
+Q3
+```{r}
+pointsCards = ligue1[, c("Points", "yellow.cards")]
+pointsCards
+```
+Q4
+```{r}
+km = kmeans(pointsCards, centers = 2, nstart = 20)
+```
+Q5
+```{r}
+km
+```
+Clustering vector groups the value into categories, cluster means are the center of the categories
+Q6
+```{r}
+km$centers
+```
+Q7
+```{r}
+plot(pointsCards, col = km$cluster, pch = 19)
+```
+Q8
+
+```{r}
+plot(pointsCards, col = km$cluster, pch = 19)
+points(km$centers,col=c("black","red"),pch=3,cex = 2,lwd=2)
+```
+Q9
+```{r}
+km3 = kmeans(pointsCards, centers = 3, nstart = 20)
+plot(pointsCards, col = km3$cluster, pch = 19, main = "Km3")
+points(km3$centers,col=c("black","red","green"),pch=3,cex = 2,lwd=2)
+
+```
+```{r}
+km4 = kmeans(pointsCards, centers = 4, nstart = 20)
+plot(pointsCards, col = km4$cluster, pch = 19, main = "Km3")
+points(km4$centers,col=c("black","red","green","darkcyan"),pch=3,cex = 2,lwd=2)
+```
+
+```{r}
+km
+```
+Q10
+```{r}
+mydata = pointsCards
+wss = (nrow(mydata)-1)*sum(apply(mydata,2,var))
+   
+for (i in 2:15){
+    wss[i] = sum(kmeans(mydata,centers=i)$withinss)
+    }
+
+plot(1:15, wss, type="b", xlab="Number of Clusters",
+      ylab="Within groups sum of squares")
+```
+
+Q11
+```{r}
+mydata = pointsCards
+wss = (nrow(mydata)-1)*sum(apply(mydata,2,var))
+   
+for (i in 1:15){
+    wss[i] = kmeans(mydata,centers=i)$betweenss/kmeans(mydata,centers=i)$totss
+    } 
+plot(1:15, wss, type="b", xlab="Number of Clusters",ylab="between_SS / total_SS")
+```
+Q12
+
+```{r}
+ligue_scaled = data.frame(scale(ligue1))
+```
+```{r}
+ligue_scaled
+```
+Q13
+
+```{r}
+km.ligue1.scaled = kmeans(ligue_scaled,3,20)
+km.ligue1 = kmeans(ligue1,3,20)
+```
+
+
+```{r}
+table(km.ligue1$cluster)
+table(km.ligue1.scaled$cluster)
+```
+
+```{r}
+library(factoextra)
+```
+Q15 ET 16 
+```{r}
+pca.ligue1=princomp(ligue1, cor=T)
+
+#scree plot ( plot of the eigenvalues (Valeurs propres) )
+fviz_eig(pca.ligue1)
+
+#Graph of individuals
+fviz_pca_ind(pca.ligue1)
+
+#Graph of variables
+fviz_pca_var(pca.ligue1)
+
+#Biplot graph
+fviz_pca_biplot(pca.ligue1)
+
+#Contributions of the vaaribles to the 2 principal components ( axis )
+fviz_contrib(pca.ligue1,choice = 'var',axes = 1)
+fviz_contrib(pca.ligue1,choice = 'var',axes = 2)
+```
+
+```{r}
+pca.ligue1.scaled = princomp(ligue_scaled, cor=T)
+
+#scree plot ( plot of the eigenvalues (Valeurs propres) )
+fviz_eig(pca.ligue1.scaled)
+
+#Graph of individuals
+fviz_pca_ind(pca.ligue1.scaled)
+
+#Graph of variables
+fviz_pca_var(pca.ligue1.scaled)
+
+#Biplot graph
+fviz_pca_biplot(pca.ligue1.scaled)
+
+#Contributions of the vaaribles to the 2 principal components ( axis )
+fviz_contrib(pca.ligue1.scaled,choice = 'var',axes = 1)
+fviz_contrib(pca.ligue1.scaled,choice = 'var',axes = 2)
+```
+
+Q17
+```{r}
+# You can use the following code, based on `factoextra` library.
+fviz_cluster(km.ligue1, data = ligue1, # km.ligue1 is where you stored your kmeans results
+              palette = c("darkred", "gold3", "darkgreen"), # 3 colors since 3 clusters
+              ggtheme = theme_minimal(),
+              main = "Clustering Plot")
+```
+
+Q18
+```{r}
+km_2 = kmeans(pca.ligue1$scores[, 1:2], centers = 3, nstart = 20)
+fviz_cluster(km_2, data = pca.ligue1$scores[, 1:2], 
+              palette = c("darkred", "gold3","darkgreen"), 
+              ggtheme = theme_minimal(),
+              main = "Clustering Plot On First 2 PCs")
+```
+Q19
+```{r}
+X1 = c(1,1,0,5,6,4)
+X2 = c(4,3,4,1,2,0)
+plot(X1,X2)
+obsv = data.frame(X1,X2, row.names = c(1,2,3,4,5,6))
+```
+
+
+```{r}
+obsv$label = sample(c(1,2),6,replace = T)
+obsv
+```
+Q21
+
+```{r}
+centroid_1 = c(mean(obsv$X1[obsv$label == 1]),mean(obsv$X2[obsv$label == 1]))
+centroid_2 = c(mean(obsv$X1[obsv$label == 2]),mean(obsv$X2[obsv$label == 2]))
+```
+
+Q22
+```{r}
+euc = function(a,b)
+{
+  rslt = sqrt((a[1]-b[1])**2+(a[2]-b[2])**2)
+}
+```
+
+
+```{r}
+dis = euc(centroid_1,centroid_2)
+dis
+```
+
+Q23
+```{r}
+
+for (i in 1:nrow(obsv)) 
+  {
+  if (euc(obsv[i, c("X1", "X2")], centroid_1) < euc(obsv[i, c("X1", "X2")], centroid_2))
+    {
+    obsv$labels[i] = 1
+    } 
+  else 
+    {
+    obsv$labels[i] = 2
+    }
+  }
+
+```
+Q24
+
+```{r}
+obsv.labels.old = rep(-1, 6)
+while (!all(obsv.labels.old == obsv$labels)) {
+  obsv.labels.old = obsv$labels
+  centroid_1 = c(mean(obsv[obsv$labels==1, "X1"]), mean(obsv[obsv$labels==1, "X2"]))
+  centroid_2 = c(mean(obsv[obsv$labels==2, "X1"]), mean(obsv[obsv$labels==2, "X2"]))
+  for (i in 1:nrow(obsv)) {
+    if (euc(obsv[i, c("X1", "X2")], centroid_1) < euc(obsv[i, c("X1", "X2")], centroid_2)) {
+      obsv$labels[i] <- 1
+    } else {
+      obsv$labels[i] <- 2
+    }
+  }
+}
+```
+Q25
+
+```{r}
+plot(obsv[, "X1"], obsv[, "X2"], col=(obsv$labels+1), pch=20, cex=2, main="Clustering plot",
+     xlab="X1",ylab="X2")
+points(centroid_1[1], centroid_1[2], col=2, pch=4,cex = 3)
+points(centroid_2[1], centroid_2[2], col=3, pch=4, cex = 3)
+```
+```{r}
+```
+EXERCICE 2
+
+Q1
+```{r}
+M = matrix(1:15,5,3)
+M
+```
+```{r}
+dist(M)
+```
+```{r}
+dist(M, method= "manhattan")
+```
+
+```{r}
+dendro = hclust(dist(M))
+plot(dendro)
+```
+
+```{r}
+iris = read.csv("iris.data", header=T,sep=',')
+```
+
+Q2
+```{r}
+set.seed(123)
+sampleiris = iris[sample(1:150, 40),]
+```
+Q3
+```{r}
+D = dist(sampleiris[,-5])
+```
+Q4
+```{r}
+dendro.avg  = hclust(D, method="average")
+```
+Q5
+```{r}
+plot(dendro.avg)
+```
+Q6
+```{r}
+plot(dendro.avg, hang=-1, label=sampleiris$class)
+```
+Q7
+```{r}
+groups.avg <- cutree(dendro.avg, k = 3)
+```
+Q8
+```{r}
+plot(dendro.avg, hang=-1, label=sampleiris$class)
+rect.hclust(dendro.avg, 3)
+rect.hclust(dendro.avg, 3, border = c ("darkred", "golden3", "darkcyan"))
+```
+Q9
+```{r}
+table(groups.avg, sampleiris$class)
+```
